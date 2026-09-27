@@ -1,6 +1,6 @@
 {
   "functions": {
-    "public/*.php": {
+    "api/*.php": {
       "runtime": "vercel-php@0.7.3"
     }
   },
@@ -14,8 +14,12 @@
       "dest": "/public/images/$1"
     },
     {
+      "src": "/api-reactions.php",
+      "dest": "/api/index.php"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/public/index.php"
+      "dest": "/api/index.php"
     }
   ]
 }
