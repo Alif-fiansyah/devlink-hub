@@ -1,0 +1,144 @@
+// Variabel Tema
+$bg-primary: #0b0f17;
+$bg-card: rgba(17, 24, 39, 0.7);
+$border-color: rgba(56, 189, 248, 0.2);
+$text-main: #f8fafc;
+$text-muted: #94a3b8;
+$accent-blue: #38bdf8;
+$accent-purple: #818cf8;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: $bg-primary;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(129, 140, 248, 0.12) 0px, transparent 50%);
+  color: $text-main;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.hub-container {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+// Profil Header
+.profile-card {
+  text-align: center;
+  
+  .avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 2px solid $accent-blue;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    object-fit: cover;
+    margin-bottom: 12px;
+  }
+
+  .name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .bio {
+    font-size: 13.5px;
+    color: $text-muted;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .badge-dev {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+    background: rgba(56, 189, 248, 0.1);
+    color: $accent-blue;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+}
+
+// Daftar Tautan Link
+.links-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  text-decoration: none;
+  color: $text-main;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: $accent-blue;
+    box-shadow: 0 4px 18px rgba(56, 189, 248, 0.15);
+    background: rgba(22, 30, 49, 0.9);
+  }
+
+  .link-info {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    .desc {
+      font-size: 11.5px;
+      color: $text-muted;
+      margin-top: 2px;
+    }
+  }
+
+  .link-arrow {
+    color: $accent-blue;
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover .link-arrow {
+    transform: translateX(4px);
+  }
+}
+
+// Footer
+.footer-text {
+  font-size: 11px;
+  color: #475569;
+  font-family: monospace;
+  margin-top: 10px;
+}
