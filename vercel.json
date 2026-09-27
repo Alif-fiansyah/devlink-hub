@@ -1,9 +1,15 @@
 {
-  "functions": {
-    "api/*.php": {
-      "runtime": "vercel-php@0.7.3"
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/**/*.php",
+      "use": "vercel-php@0.7.3"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/dist/(.*)",
@@ -15,11 +21,11 @@
     },
     {
       "src": "/api-reactions.php",
-      "dest": "/api/index.php"
+      "dest": "/public/api-reactions.php"
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.php"
+      "dest": "/public/index.php"
     }
   ]
 }
