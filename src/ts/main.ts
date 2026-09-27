@@ -6,29 +6,29 @@ class HapticFeedback {
       if (AudioCtx) this.ctx = new AudioCtx();
     }
   }
-  playPop() {
+  playTone(freq: number = 440, type: OscillatorType = 'sine') {
     try {
       this.init();
       if (!this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.04);
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq / 2, this.ctx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.04);
+      osc.stop(this.ctx.currentTime + 0.05);
     } catch (_) {}
   }
 }
 
-// Discord User ID Lifianzhi
 const DISCORD_USER_ID = "805207928612061244";
 
+// 1. Spotify Live Polling
 async function fetchLiveSpotify() {
   const titleEl = document.getElementById('sp-title');
   const artistEl = document.getElementById('sp-artist');
@@ -68,17 +68,74 @@ async function fetchLiveSpotify() {
       artistEl.textContent = "Hindia (Favorite)";
       if (cardEl) cardEl.href = "https://open.spotify.com";
     }
-  } catch (err) {
-    console.error("Lanyard Spotify sync error:", err);
-  }
+  } catch (err) {}
+}
+
+// 2. Fetch Latest Pushed GitHub Repository
+async function fetchLatestRepo() {
+  const repoNameEl = document.getElementById('latest-repo-name');
+  const repoDescEl = document.getElementById('latest-repo-desc');
+  const repoLink = document.getElementById('latest-repo-link') as HTMLAnchorElement | null;
+
+  try {
+    const res = await fetch('https://api.github.com/users/Alif-fiansyah/repos?sort=pushed&per_page=1');
+    const repos = await res.json();
+    if (repos && repos.length > 0) {
+      const r = repos[0];
+      if (repoNameEl) repoNameEl.textContent = r.name;
+      if (repoDescEl) repoDescEl.textContent = r.language ? `★ ${r.language}` : "Updated recently";
+      if (repoLink) repoLink.href = r.html_url;
+    }
+  } catch (e) {}
+}
+
+// 3. Global SQLite Reactions Sync
+async function initReactions(haptic: HapticFeedback) {
+  const reactionTypes = [
+    { id: 'vibe-coffee', type: 'coffee', tone: 520 },
+    { id: 'vibe-arch', type: 'arch', tone: 660 },
+    { id: 'vibe-fire', type: 'fire', tone: 800 }
+  ];
+
+  try {
+    const res = await fetch('api-reactions.php');
+    const data = await res.json();
+    reactionTypes.forEach(r => {
+      const countEl = document.querySelector(`#${r.id} .count`);
+      if (countEl && data[r.type] !== undefined) {
+        countEl.textContent = `${data[r.type]}`;
+      }
+    });
+  } catch (e) {}
+
+  reactionTypes.forEach(r => {
+    const btn = document.getElementById(r.id);
+    const countEl = btn?.querySelector('.count');
+    if (!btn || !countEl) return;
+
+    btn.addEventListener('click', async () => {
+      haptic.playTone(r.tone, 'triangle');
+      try {
+        const res = await fetch('api-reactions.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: r.type })
+        });
+        const json = await res.json();
+        if (json.count !== undefined) {
+          countEl.textContent = `${json.count}`;
+        }
+      } catch (e) {}
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const haptic = new HapticFeedback();
 
-  // Tactile sound effect
-  document.querySelectorAll<HTMLElement>('.dock-item, .spotify-card, .mini-card, .simple-card, .btn-copy, .cli-box').forEach(el => {
-    el.addEventListener('mousedown', () => haptic.playPop());
+  // Button pop sounds
+  document.querySelectorAll<HTMLElement>('.dock-item, .spotify-card, .mini-card, .pill-btn, .btn-copy, .cli-box').forEach(el => {
+    el.addEventListener('mousedown', () => haptic.playTone(380, 'sine'));
   });
 
   // CLI Accordion
@@ -90,7 +147,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Real-time Clock (Semarang WIB)
+  // Dotfiles One-Click Copy
+  const dotfilesBtn = document.getElementById('btn-copy-dotfiles');
+  if (dotfilesBtn) {
+    dotfilesBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText("https://github.com/Alif-fiansyah/dotfiles");
+        const hint = dotfilesBtn.querySelector('.action-hint');
+        if (hint) {
+          const original = hint.textContent;
+          hint.textContent = "COPIED! ✓";
+          setTimeout(() => hint.textContent = original, 2000);
+        }
+      } catch (e) {}
+    });
+  }
+
+  // Real-time Clock
   const clockElement = document.getElementById('live-clock');
   const updateClock = () => {
     if (!clockElement) return;
@@ -106,14 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
     copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(window.location.origin);
-        const original = copyBtn.innerText;
         copyBtn.innerText = '✓ URL COPIED';
-        setTimeout(() => copyBtn.innerText = original, 2000);
+        setTimeout(() => copyBtn.innerText = 'copy profile url', 2000);
       } catch (err) {}
     });
   }
 
-  // Poll Spotify Status secara berkala (setiap 5 detik)
   fetchLiveSpotify();
   setInterval(fetchLiveSpotify, 5000);
+  fetchLatestRepo();
+  initReactions(haptic);
 });
