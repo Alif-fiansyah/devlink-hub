@@ -1,33 +1,12 @@
 <?php
-// Data Profile & Links (Bisa dipindah ke SQLite)
+require_once __DIR__ . '/../data/db.php';
+$links = get_all_links($pdo);
+
 $profile = [
     "name" => "Alif Fiansyah",
     "role" => "Software Engineer & DevOps Explorer",
-    "avatar" => "https://avatars.githubusercontent.com/u/583231?v=4", // Ganti dengan avatar/github kamu
+    "avatar" => "https://avatars.githubusercontent.com/u/583231?v=4",
     "badge" => "AVAILABLE FOR COLLAB"
-];
-
-$links = [
-    [
-        "title" => "SentinelCore Observability",
-        "desc" => "Live real-time system & endpoint monitoring dashboard",
-        "url" => "https://monitoring-server.streamlit.app/?view=status"
-    ],
-    [
-        "title" => "GitHub Repositories",
-        "desc" => "Koleksi proyek open-source, script, dan riset teknis",
-        "url" => "https://github.com"
-    ],
-    [
-        "title" => "Curriculum Vitae",
-        "desc" => "Resume profesional, riwayat proyek & keahlian teknis",
-        "url" => "#"
-    ],
-    [
-        "title" => "Direct Contact (Discord / WhatsApp)",
-        "desc" => "Terhubung langsung untuk diskusi proyek atau konsultasi",
-        "url" => "#"
-    ]
 ];
 ?>
 <!DOCTYPE html>
@@ -36,12 +15,20 @@ $links = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($profile['name']) ?> | DevLink Hub</title>
-    <!-- Hasil Compile SCSS -->
     <link rel="stylesheet" href="dist/style.css">
 </head>
 <body>
 
     <div class="hub-container">
+        <!-- SentinelCore Live Telemetry Widget -->
+        <div class="telemetry-widget">
+            <div class="widget-left">
+                <div class="pulse-dot"></div>
+                <span>SentinelCore Observability</span>
+            </div>
+            <div class="widget-status">OPERATIONAL (100%)</div>
+        </div>
+
         <!-- Profile Header -->
         <header class="profile-card">
             <img class="avatar" src="<?= htmlspecialchars($profile['avatar']) ?>" alt="Avatar">
@@ -50,29 +37,45 @@ $links = [
             <span class="badge-dev"><?= htmlspecialchars($profile['badge']) ?></span>
         </header>
 
-        <!-- Links Group -->
+        <!-- Links List -->
         <main class="links-group">
             <?php foreach ($links as $link): ?>
-                <a href="<?= htmlspecialchars($link['url']) ?>" class="link-item" target="_blank" rel="noopener noreferrer">
+                <a href="<?= htmlspecialchars($link['url']) ?>" 
+                   class="link-item" 
+                   data-id="<?= $link['id'] ?>"
+                   target="_blank" 
+                   rel="noopener noreferrer">
                     <div class="link-info">
                         <span class="title"><?= htmlspecialchars($link['title']) ?></span>
-                        <span class="desc"><?= htmlspecialchars($link['desc']) ?></span>
+                        <span class="desc"><?= htmlspecialchars($link['description']) ?></span>
                     </div>
                     <span class="link-arrow">→</span>
                 </a>
             <?php endforeach; ?>
         </main>
 
-        <!-- Action / Footer -->
-        <button id="share-btn" style="background:none; border:none; color:#64748b; font-size:12px; cursor:pointer; font-family:monospace;">
-            Salin Tautan Profil
-        </button>
+        <!-- Theme Switcher Pills -->
+        <div class="theme-bar">
+            <button data-set-theme="slate">Slate</button>
+            <button data-set-theme="cyberpunk">Cyberpunk</button>
+            <button data-set-theme="emerald">Emerald</button>
+        </div>
+
+        <div style="display: flex; gap: 14px; align-items: center;">
+            <button id="share-btn" style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer; font-family:monospace;">
+                Salin Tautan Profil
+            </button>
+            <span style="color:var(--border-color);">•</span>
+            <a href="admin.php" style="color:var(--accent); font-size:12px; text-decoration:none; font-family:monospace;">
+                Panel Pengelola
+            </a>
+        </div>
+
         <footer class="footer-text">
             DevLink Engine • PHP + SCSS + TypeScript
         </footer>
     </div>
 
-    <!-- Hasil Compile TypeScript -->
     <script type="module" src="dist/main.bundle.js"></script>
 </body>
 </html>
